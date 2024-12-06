@@ -1,0 +1,8 @@
+.venv
+venv
+outputs/
+test_lut.py
+
+.vscode/*
+.DS_Store
+lib64
