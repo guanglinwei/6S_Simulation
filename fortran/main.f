@@ -1391,11 +1391,11 @@ c       164     DMC      band           (197,199)
      s      162,162,162,162,162,162,162,162,162,162,162,162,
      s      163,163,163,163,163,163,163,163,163,163,163,
      s      164,164,164,
-     s      165,
-     s      166,
-     s      167,
-     s      168,
-     s      169),iwave
+     s      9900,
+     s      9901,
+     s      9902,
+     s      9903,
+     s      9904),iwave
   110 read(iread,*) wlinf,wlsup
       iinf=(wlinf-.25)/0.0025+1.5
       isup=(wlsup-.25)/0.0025+1.5
@@ -1452,17 +1452,17 @@ c       164     DMC      band           (197,199)
       goto 19 
   164 call dmc(iwave-196)
       goto 19 
-  165 call goesr1(iwave-199)
-      goto 19
-  166 call goesr2(iwave-200)
-      goto 19
-  167 call goesr3(iwave-201)
-      goto 19
-  168 call goesr5(iwave-202)
-      goto 19
-  169 call goesr6(iwave-203)
-      goto 19
 
+ 9900 call goesr1(iwave-199)
+      goto 19
+ 9901 call goesr2(iwave-200)
+      goto 19
+ 9902 call goesr3(iwave-201)
+      goto 19
+ 9903 call goesr5(iwave-202)
+      goto 19
+ 9904 call goesr6(iwave-203)
+      goto 19
    19 iinf=(wlinf-.25)/0.0025+1.5
       isup=(wlsup-.25)/0.0025+1.5
       if (iprtspr.eq.1) then
@@ -2390,25 +2390,25 @@ c501  format(5(i10,2x))
       rbarc=rbar*lddiftt*ludirtt
       rbarpc=rbarp*ludiftt*lddirtt
       rdirc=sbrdftmp(1,1)*ludirtt*lddirtt
-c      write(6,*) "romixsur,rbarc,rbarpc,rdirc",romixsur,rbarc,rbarpc,rdirc
+c       write(6,*) "romixsur,rbarc,rbarpc,rdirc",romixsur,rbarc,rbarpc,rdirc
  
       coefc=-(romixsur-rbarc-rbarpc-rdirc)
 c       write(6,*) " lddiftt,ludiftt ", lddiftt,ludiftt 
       coefb=lddiftt*ludiftt
       coefa=(lddiftt+lddirtt)*(ludiftt+ludirtt)*lsphalbt
      a  /(1.-lsphalbt*albbrdf)
-c       write(6,*) "a,b,c",coefa,coefb,coefc
-c       write(6,*) "discri2 ",(coefb*coefb-4*coefa*coefc)
+c        write(6,*) "a,b,c",coefa,coefb,coefc
+c        write(6,*) "discri2 ",(coefb*coefb-4*coefa*coefc)
       discri=sqrt(coefb*coefb-4*coefa*coefc)
       rbard=(-coefb+discri)/(2*coefa)
-c        Write(6,*) "rbard albbrdf 1rst iteration", rbard,albbrdf
+c         Write(6,*) "rbard albbrdf 1rst iteration", rbard,albbrdf
       coefa=(lddiftt+lddirtt)*(ludiftt+ludirtt)*lsphalbt
      a  /(1.-lsphalbt*rbard)
-c       write(6,*) "a,b,c",coefa,coefb,coefc
-c       write(6,*) "discri2 ",(coefb*coefb-4*coefa*coefc)
+c        write(6,*) "a,b,c",coefa,coefb,coefc
+c        write(6,*) "discri2 ",(coefb*coefb-4*coefa*coefc)
       discri=sqrt(coefb*coefb-4*coefa*coefc)
       rbard=(-coefb+discri)/(2*coefa)
-c       Write(6,*) "rbard albbrdf 2nd iteration", rbard,albbrdf
+c        Write(6,*) "rbard albbrdf 2nd iteration", rbard,albbrdf
       
       do 335 l=iinf,isup
         rocl(l)=sbrdf(l)
@@ -2614,31 +2614,31 @@ c                     print of initial conditions                      c
 c                                                                      c
 c**********************************************************************c
 
-c ---- geometrical conditions ----
-c      write(iwr, 98)
-c      write(iwr, etiq1(igeom+1))
-c      if(igeom.eq.0) then
-c	 write(iwr, 1401)
-c	 write(iwr, 103)month,jday
-c      endif
-c      if(igeom.ne.0) write(iwr, 101)month,jday,tu,xlat,xlon
-c      write(iwr, 102)asol,phi0
-c      write(iwr, 1110)avis,phiv,adif,phi
- 
-c --- atmospheric model ----
-c      write(iwr, 1119)
-c      if(idatm-7)226,227,228
-c  228 write(iwr, 1281)uw,uo3
-c      goto 219
-c  227 write(iwr, 1272)
-c      do 229 i=1,34
-c        write(iwr, 1271)z(i),p(i),t(i),wh(i),wo(i)
-c  229 continue
-c      goto 219
-c  226 write(iwr, 1261)atmid(idatm+1)
- 
-c --- aerosols model (type) ----
-
+c c ---- geometrical conditions ----
+c       write(iwr, 98)
+c       write(iwr, etiq1(igeom+1))
+c       if(igeom.eq.0) then
+c 	 write(iwr, 1401)
+c 	 write(iwr, 103)month,jday
+c       endif
+c       if(igeom.ne.0) write(iwr, 101)month,jday,tu,xlat,xlon
+c       write(iwr, 102)asol,phi0
+c       write(iwr, 1110)avis,phiv,adif,phi
+c  
+c c --- atmospheric model ----
+c       write(iwr, 1119)
+c       if(idatm-7)226,227,228
+c   228 write(iwr, 1281)uw,uo3
+c       goto 219
+c   227 write(iwr, 1272)
+c       do 229 i=1,34
+c         write(iwr, 1271)z(i),p(i),t(i),wh(i),wo(i)
+c   229 continue
+c       goto 219
+c   226 write(iwr, 1261)atmid(idatm+1)
+c  
+c c --- aerosols model (type) ----
+c 
 c 219    write(iwr,5550)
 c        if(iaer.eq.0) then
 c         write(iwr, 5554)
@@ -3370,7 +3370,7 @@ c      we define the degrees of polarization
 	else sdpaer=0.0
 	endif 
 	sdptot=100.*srptot/srotot
-c       and we compute the direction of the plane of polarization
+c      and we compute the direction of the plane of polarization
 	call dirpopol(srqray*xmus,sruray*xmus,sdppray)
 	call dirpopol(srqaer*xmus,sruaer*xmus,sdppaer)
 	call dirpopol(srqtot*xmus,srutot*xmus,sdpptot)
@@ -3386,737 +3386,46 @@ c  ---output at satellite level
         ainr(1,j)=ainr(1,j)/seb
         ainr(2,j)=ainr(2,j)/sb
    57 continue
-c 
-c c**********************************************************************c
-c c                                                                      c
+
+c**********************************************************************c
+c                                                                      c
 c c                       print of final results                         c
 c c                                                                      c
+c c                 The following code has been edited                   c
+c c               manually to only output necessary data.                c
+c c       If you would like additional outputs from the simulation,      c
+c c              please look in the original 6S main.f file              c
+c c            and make edits, and paste the final block here.           c
 c c**********************************************************************c
-c C begining case for a lut output
-c C SIMPLE LUT in azimuth
-c       if (ilut.eq.2) then
-c           do ifi=1,nfi
-c 	  xtphi=(ifi-1)*180.0/(nfi-1)
-c 	  write(6,*) "lutfi ",xtphi,ratm2_fi(ifi)
-c 	  enddo
-c       endif	  
-c 
-c C LUT FOR Look up table data        
-c       if (ilut.eq.1) then
-c       its=acos(xmus)*180.0/pi
-c       open(10,file='rotoa_bs',ACCESS='APPEND')
-c       write(10,2222) "AERO-LUT Lambda min,max ",wlinf,wlsup
-c  2222 Format(A28,3(F10.7,1X))      
-c       write(10,2222) "Tau-Lambda,Tau550 asol  ",sodaer,taer55,asol
-c       aerod=0
-c       if (iaer.eq.12) then
-c       write(10,2223) "aerosol model ",FILE2(1:i2)
-c       aerod=1
-c       endif
-c       if (iaer.eq.1) then
-c       write(10,2223) "aerosol model ","CONTINENTAL"
-c       aerod=1
-c       endif
-c       if (iaer.eq.2) then
-c       write(10,2223) "aerosol model ","MARITIME"
-c       aerod=1
-c       endif
-c       if (iaer.eq.3) then
-c       write(10,2223) "aerosol model ","URBAN"
-c       aerod=1
-c       endif
-c       if (iaer.eq.5) then
-c       write(10,2223) "aerosol model ","DESERTIC"
-c       aerod=1
-c       endif
-c       if (iaer.eq.6) then
-c       write(10,2223) "aerosol model ","SMOKE"
-c       aerod=1
-c       endif
-c       if (iaer.eq.7) then
-c       write(10,2223) "aerosol model ","STRATOSPHERIC"
-c       aerod=1
-c       endif
-c       if (aerod.eq.0) then
-c       write(10,2223) "aerosol model ","UNDEFINED"
-c       endif
-c  2223 format(A24,1X,A80)      
-c       lutmuv=cos(avis*pi/180.)
-c       cscaa=-xmus*lutmuv-cos(filut(mu,1)*pi/180.)*sqrt(1.-xmus*xmus)
-c      S  *sqrt(1.-lutmuv*lutmuv)
-c       iscama=acos(cscaa)*180./pi
-c       cscaa=-xmus*lutmuv-cos(filut(mu,nfilut(mu))*pi/180.)
-c      S  *sqrt(1.-xmus*xmus)*sqrt(1.-lutmuv*lutmuv)
-c       iscami=acos(cscaa)*180./pi
-c       write(10,333) its,avis,nfilut(mu),iscama,iscami
-c       write(10,'(41(F8.5,1X))')(roluti(mu,j)/seb,j=1,nfilut(mu))
-c C      write(10,'(41(F8.5,1X))')(rolutiq(mu,j)/seb,j=1,nfilut(mu))
-c C      write(10,'(41(F8.5,1X))')(rolutiu(mu,j)/seb,j=1,nfilut(mu))
-c       do i=1,mu-1
-c       lutmuv=rm(i)
-c       luttv=acos(lutmuv)*180./pi
-c       cscaa=-xmus*lutmuv-cos(filut(i,1)*pi/180.)*sqrt(1.-xmus*xmus)
-c      S  *sqrt(1.-lutmuv*lutmuv)
-c       iscama=acos(cscaa)*180./pi
-c       cscaa=-xmus*lutmuv-cos(filut(i,nfilut(i))*pi/180.)
-c      S  *sqrt(1.-xmus*xmus)*sqrt(1.-lutmuv*lutmuv)
-c       iscami=acos(cscaa)*180./pi
-c       write(10,333) its,luttv,nfilut(i),iscama,iscami
-c  333  Format(F10.5,1X,F10.5,1X,I3,F10.5,F10.5)    
-c       write(10,'(41(F8.5,1X))')(roluti(i,j)/seb,j=1,nfilut(i))
-c C      write(10,'(41(F8.5,1X))')(rolutiq(i,j)/seb,j=1,nfilut(i))
-c C      write(10,'(41(F8.5,1X))')(rolutiu(i,j)/seb,j=1,nfilut(i))
-c       enddo
-c       close(10)
-c       endif
-c C Case a LUT output is desired
-c 
-c C Case for an aps LUT
-c       if (ilut.eq.3) then
-c       its=acos(xmus)*180.0/pi
-c       open(10,file='rotoa_aps_bs',ACCESS='APPEND')
-c       write(10,2222) "AERO-LUT Lambda min,max ",wlinf,wlsup
-c       write(10,2222) "Tau-Lambda,Tau550 asol  ",sodaer,taer55,asol
-c       aerod=0
-c       if (iaer.eq.12) then
-c       write(10,2223) "aerosol model ",FILE2(1:i2)
-c       aerod=1
-c       endif
-c       if (iaer.eq.1) then
-c       write(10,2223) "aerosol model ","CONTINENTAL"
-c       aerod=1
-c       endif
-c       if (iaer.eq.2) then
-c       write(10,2223) "aerosol model ","MARITIME"
-c       aerod=1
-c       endif
-c       if (iaer.eq.3) then
-c       write(10,2223) "aerosol model ","URBAN"
-c       aerod=1
-c       endif
-c       if (iaer.eq.5) then
-c       write(10,2223) "aerosol model ","DESERTIC"
-c       aerod=1
-c       endif
-c       if (iaer.eq.6) then
-c       write(10,2223) "aerosol model ","SMOKE"
-c       aerod=1
-c       endif
-c       if (iaer.eq.7) then
-c       write(10,2223) "aerosol model ","STRATOSPHERIC"
-c       aerod=1
-c       endif
-c       if (aerod.eq.0) then
-c       write(10,2223) "aerosol model ","UNDEFINED"
-c       endif
-c 
-c C 
-c       dtr=atan(1.)*4./180.
-c       write(10,'(A5,1X,41(F8.4,1X))') 'phi',(filut(i,1),i=16,1,-1),
-c      S                      filut(mu,1),(filut(i,2),i=1,16)
-c      
-c       write(10,'(A5,1X,41(F8.5,1X))') 'tv',(acos(rm(i))/dtr,i=16,1,-1)
-c      S  ,acos(rm(0))/dtr,(acos(rm(k))/dtr,k=1,16)
-c      
-c       write(10,'(41(F8.5,1X))')(roluti(i,1)/seb,i=16,1,-1)
-c      S     ,roluti(mu,1)/seb ,(roluti(i,2)/seb,i=1,16)
-c       write(10,'(41(F8.5,1X))')(rolutiq(i,1)/seb,i=16,1,-1)
-c      S     ,rolutiq(mu,1)/seb,(rolutiq(i,2)/seb,i=1,16)
-c       write(10,'(41(F8.5,1X))')(rolutiu(i,1)/seb,i=16,1,-1)
-c      S     ,rolutiu(mu,1)/seb,(rolutiu(i,2)/seb,i=1,16)
-c       close(10)
-c       endif
-c C Case a LUT output is desired      
-c 
-c  160  continue
-c  
-c         write(iwr, 430 )refet,alumet,tgasm
-c         write(iwr, 431 )refet1,refet2,refet3
-c 
-c       if (ipol.eq.1)then
-c         rpfet=sqrt(rqfet*rqfet+rufet*rufet)
-c 	plumet=sqrt(qlumet*qlumet+ulumet*ulumet)
-c 	xpol=atan2(rufet,rqfet)*180.0/3.14159/2.
-c         write(iwr, 429 )rpfet,plumet,xpol,rpfet/refet
-c C       write(iwr, 428 )rpfet1,rpfet2,rpfet3
-c       endif
-c  
-c        if(inhomo.ne.0) then
-c          write(iwr, 432)(aini(1,j),j=1,3),'environment','target',
-c     s          (ainr(1,j),j=1,3)
-c          write(iwr, 434)(aini(2,j),j=1,3),'environment','target',
-c     s         (ainr(2,j),j=1,3)
-c
-c        endif
-c        if(inhomo.eq.0) then
-c          write(iwr, 432)(aini(1,j),j=1,3),'background ','pixel ',
-c     s		(ainr(1,j),j=1,3)
-c          write(iwr, 434)(aini(2,j),j=1,3),'background ','pixel ',
-c     s         (ainr(2,j),j=1,3)
-c        endif
-    
+c       direct irradiance ratio and atmospheric path reflectance
         if(inhomo.ne.0) then
           write(iwr, 432)(aini(1,j),j=1,3), (ainr(1,j),j=1,3)
-c           write(iwr, 434)(aini(2,j),j=1,3), (ainr(2,j),j=1,3)
 
           endif
           if(inhomo.eq.0) then
           write(iwr, 432)(aini(1,j),j=1,3), (ainr(1,j),j=1,3)
-c           write(iwr, 434)(aini(2,j),j=1,3), (ainr(2,j),j=1,3)
           endif
-c       
-c       if (iwave.eq.-1)then
-c         write(iwr, 436)seb
-c       else
-c         write(iwr, 437)sb,seb
-c       endif
-c 
+
 c c**********************************************************************c
 c c                                                                      c
 c c                    print of complementary results                    c
 c c                                                                      c
 c c**********************************************************************c
-c       write(iwr, 929)
-c       write(iwr, 930)
-c c !!!
-c       write(iwr, 931)'global gas. trans. :',dgasm,ugasm,tgasm
+c       global gas transmittance total
       write(iwr, 931)tgasm
-c       write(iwr, 931)'water   "     "    :',sdwava,suwava,stwava
-c       write(iwr, 931)'ozone   "     "    :',sdozon,suozon,stozon
-c       write(iwr, 931)'co2     "     "    :',sddica,sudica,stdica
-c       write(iwr, 931)'oxyg    "     "    :',sdoxyg,suoxyg,stoxyg
-c       write(iwr, 931)'no2     "     "    :',sdniox,suniox,stniox
-c       write(iwr, 931)'ch4     "     "    :',sdmeth,sumeth,stmeth
-c       write(iwr, 931)'co      "     "    :',sdmoca,sumoca,stmoca
-c       write(iwr, 1401)
-c       write(iwr, 1401)
-c  
-c       write(iwr, 931)'rayl.  sca. trans. :',sdtotr,sutotr,sutotr*sdtotr
-c       write(iwr, 931)'aeros. sca.   "    :',sdtota,sutota,sutota*sdtota
-c       write(iwr, 931)'total  sca.   "    :',sdtott,sutott,sutott*sdtott
+c       downward and upwards scattering transmittance total
       write(iwr, 931)sdtott
       write(iwr, 931)sutott
-c       write(iwr, 1401)
-c       write(iwr, 1401)
-c  
-c       write(iwr, 939)
-c       write(iwr, 931)'spherical albedo   :',sasr,sasa,sast
+c       spherical albedo
       write(iwr, 931)sast
-c       write(iwr, 931)'optical depth total:',sodray,sodaer,sodtot
+c       optical depth total
       write(iwr, 931)sodtot
-c       write(iwr, 931)'optical depth plane:',sodrayp,sodaerp,sodtotp
-c       if (ipol.eq.0) then
-c         write(iwr, 931)'reflectance        :',sroray,sroaer,srotot
-c         write(iwr, 931)'phase function     :',fophsr,fophsa,fophst
-c       else 
-c         write(iwr, 931)'reflectance I      :',sroray,sroaer,srotot
-c         write(iwr, 931)'reflectance Q      :',srqray,srqaer,srqtot
-c         write(iwr, 931)'reflectance U      :',sruray,sruaer,srutot
-c         write(iwr, 931)'polarized reflect. :',srpray,srpaer,srptot
-c         write(iwr, 932)'degree of polar.   :',sdpray,sdpaer,sdptot
-c         write(iwr, 932)'dir. plane polar.  :',sdppray,sdppaer,sdpptot
-c CCC	write(iwr, 931)'instrument app ref.:',zero,zero,refeti
-c         write(iwr, 931)'phase function I   :',fophsr,fophsa,fophst
-c         write(iwr, 931)'phase function Q   :',foqhsr,foqhsa,foqhst
-c         write(iwr, 931)'phase function U   :',fouhsr,fouhsa,fouhst
-c         write(iwr, 931)'primary deg. of pol:',spdpray,spdpaer,spdptot
-c       endif
-c       write(iwr, 931)'sing. scat. albedo :',pizerr,pizera,pizert
-c       write(iwr, 1401)
-c       write(iwr, 1402)
-c  
-c c**********************************************************************c
-c c                                                                      c
-c c                    atmospheric correction                            c
-c c                                                                      c
-c c**********************************************************************c
-c        if (irapp.ge.0) then
-c 	 if (rapp.ge.0.) then
-c 	    xrad=rapp
-c 	    rapp=pi*xrad*sb/xmus/seb
-c 	 else
-c 	    rapp=-rapp
-c 	    xrad=xmus*seb*(rapp)/pi/sb
-c 	 endif
-c          rog=rapp/tgasm
-c          rog=(rog-ainr(1,1)/tgasm)/sutott/sdtott
-c          rog=rog/(1.+rog*sast)
-c 	 roglamb=rog
-c 	 xa=pi*sb/xmus/seb/tgasm/sutott/sdtott
-c 	 xap=1./tgasm/sutott/sdtott
-c 	 xb=ainr(1,1)/sutott/sdtott/tgasm
-c 	 xb=ainr(1,1)/sutott/sdtott/tgasm
-c 	 xc=sast
-c c        BRDF coupling correction 
-c          if (idirec.eq.1) then 
-c C   compute ratios and transmissions
-c          if (rocave.lt.1E-09) then
-c 	 write(6,*) "error rodir is near zero could not proceed with coupling correction"
-c 	 rogbrdf=-1.
-c 	 goto 3333
-c 	 endif
-c          robarstar=(robar1/xnorm1)/rocave
-c 	 robarpstar=(robar2/xnorm2)/rocave
-c 	 robarbarstar=rbard/rocave
-c 	 tdd=exp(-sodtot/xmus)
-c 	 tdu=exp(-sodtot/xmuv)
-c 	 tsd=sdtott-tdd
-c 	 tsu=sutott-tdu
-c 	 
-c c compute coefficients
-c 	 
-c 	 coefc=(rapp/tgasm-ainr(1,1)/tgasm)
-c 	  
-c 	 coefb=tdd*tdu+tdu*tsd*robarstar+tsu*tdd*robarpstar
-c 	 coefb=coefb+tsu*tsd*robarbarstar
-c 	 
-c 	 coefa=sdtott*sutott*sast*robarbarstar*roglamb
-c 	 coefa=coefa/(1-sast*roglamb)
-c 	 rogbrdf=coefc/(coefa+coefb) 
-c 	 
-c 
-c c second pass use update value for rbard
-c          rbardest=robarbarstar*rogbrdf
-c 	 coefb=tdd*tdu+tdu*tsd*robarstar+tsu*tdd*robarpstar
-c 	 coefb=coefb+tsu*tsd*robarbarstar
-c 	 
-c 	 coefa=sdtott*sutott*sast*robarbarstar*rbardest
-c 	 coefa=coefa/(1-sast*rbardest)
-c 	 rogbrdf=coefc/(coefa+coefb) 
-c c	 write(6,*) "first estimate rogbrdf",rogbrdf
-c c recompute the	rbardest for BRDF model 
-c          if ((ibrdf.eq.10).or.(ibrdf.eq.11)) then
-c c decompose for inclusion as ground boundary conditions in OS
-c 	 p1p=p1*rogbrdf/rocave
-c 	 p2p=p2*rogbrdf/rocave 
-c 	 p3p=p3*rogbrdf/rocave
-c c	 write(6,*) "p1p,p2p,p3p ",p1p,p2p,p3p
-c          rm(-mu)=phirad
-c          rm(mu)=xmuv
-c          rm(0)=xmus     
-c 	 if (ibrdf.eq.10) then     
-c          call modisbrdffos(p1p,p2p,p3p,mu,rm,
-c      s       rosur,wfisur,fisur)
-c          endif
-c 	 if (ibrdf.eq.11) then     
-c          call rlmaignanbrdffos(p1p,p2p,p3p,mu,rm,
-c      s       rosur,wfisur,fisur)
-c          endif
-c c call ossurf to compute the actual brdf coupling  
-c       rm(-mu)=-xmuv
-c       rm(mu)=xmuv
-c       rm(0)=-xmus
-c       spalt=1000.
-c       call ossurf(iaer_prof,tamoyp,trmoyp,pizmoy,tamoyp,trmoyp,spalt,
-c      s               phirad,nt,mu,np,rm,gb,rp,rosur,wfisur,fisur,
-c      s                     xlsurf,xlphim,nfi,rolutsurf)	 
-c       romixsur=(xlsurf(-mu,1)/xmus)-romixatm
-c       rbarc=lddiftt*ludirtt*robarstar*rogbrdf
-c       rbarpc=ludiftt*lddirtt*robarpstar*rogbrdf
-c       rdirc=ludirtt*lddirtt*rogbrdf
-c c      write(6,*) "romixsur,rbarc,rbarpc,rdirc",romixsur,rbarc,rbarpc,rdirc
-c       coefc=-(romixsur-rbarc-rbarpc-rdirc)
-c       coefb=lddiftt*ludiftt
-c       coefa=(lddiftt+lddirtt)*(ludiftt+ludirtt)*lsphalbt/(1.-lsphalbt*rbardest)
-c       discri=sqrt(coefb*coefb-4*coefa*coefc)
-c       rbard=(-coefb+discri)/(2*coefa)
-c c        Write(6,*) "rbard albbrdf 1rst iteration", rbard,albbrdf
-c       coefa=(lddiftt+lddirtt)*(ludiftt+ludirtt)*lsphalbt/(1.-lsphalbt*rbard)
-c       discri=sqrt(coefb*coefb-4*coefa*coefc)
-c       rbard=(-coefb+discri)/(2*coefa)
-c c       Write(6,*) "rbard albbrdf 2nd iteration", rbard,albbrdf
-c 	 robarbarstar=rbard/rogbrdf
-c 	 coefc=(rapp/tgasm-ainr(1,1)/tgasm)
-c 	 coefb=tdd*tdu+tdu*tsd*robarstar+tsu*tdd*robarpstar
-c 	 coefb=coefb+tsu*tsd*robarbarstar
-c 	 coefa=sdtott*sutott*sast*robarbarstar*rbard
-c 	 coefa=coefa/(1-sast*rbardest)
-c 	 rogbrdf=coefc/(coefa+coefb) 
-c c       
-c        endif 
-c 	 else
-c 	 rogbrdf=rog
-c 	 endif
-c 3333     Continue	 
-c C Correction in the Ocean case
-c          if (idirec.eq.1) then
-c          if (ibrdf.eq.6) then
-c          rosurfi=rapp/tgasm-ainr(1,1)/tgasm
-c          robarm=robar1/xnorm1-rfoamave-rwatave
-c          robarpm=robar2/xnorm2-rfoamave-rwatave
-c          robar2m=albbrdf-rfoamave-rwatave
-c          rosurfi=rosurfi-tdu*tsd*robarm-tsu*tdd*robarpm-tsu*tsd*robar2m
-c          rosurfi=rosurfi-sdtott*sutott*sast*robar2m*robar2m
-c      &                          /(1.-sast*robar2m)
-c          rosurfi=rosurfi-tdd*tdu*rglitave
-c          rosurfi=rosurfi/sutott/sdtott
-c          rosurfi=rosurfi/(1.+(robar2m+rosurfi+rfoamave)*sast)
-c          rooceaw=rosurfi-rfoamave
-c          write(6,*) " roocean water ",rooceaw
-c          endif
-c          endif
-c 	 
-c          write(iwr, 940)
-c          write(iwr, 941)rapp
-c          write(iwr, 942)xrad
-c 	 if (irapp.eq.0) then  
-c          write(iwr, 943)rog
-c          write(iwr, 944)xa,xb,xc
-c 	 else
-c 	 write(iwr,222)rog,rogbrdf
-c 	 endif
-c 	 
-c          write(iwr, 944)xa,xb,xc
-c          write(iwr, 945)xap,xb,xc
-c          y=xa*xrad-xb
-c c        write(6,'(A5,F9.5)') 'rog=', rog
-c c        write(6,'(A5,F9.5,A8,F9.5)') 'y=',y, '  acr=',y/(1.+xc*y)
-c c        write(6,*) 'rogbrdf=',rogbrdf,' rodir=',brdfints(mu,1),
-c c    s            ' diff=',rogbrdf-brdfints(mu,1)
-c       endif
-c       stop
-c  
-c c**********************************************************************c
-c c                                                                      c
-c c                   output editing formats                             c
-c c                                                                      c
-c c                                                                      c
-c c**********************************************************************c
-c    98 format(/////,1h*,30(1h*),17h 6SV version 2.1 ,31(1h*),t79               
-c      s       ,1h*,/,1h*,t79,1h*,/,
-c      s       1h*,22x,34h geometrical conditions identity  ,t79,1h*,/,
-c      s       1h*,22x,34h -------------------------------  ,t79,1h*)
-c   101 format(1h*,15x,7h month:,i3,7h day : ,i3,
-c      s                 16h universal time:,f6.2,
-c      s                 10h (hh.dd)  ,t79,1h*,/,
-c      s   1h*, 15x,10hlatitude: ,f7.2,5h deg ,6x,
-c      s                 12h longitude: ,f7.2,5h deg ,t79,1h*)
-c   102 format(1h*,2x,22h solar zenith angle:  ,f6.2,5h deg ,
-c      s     29h solar azimuthal angle:      ,f6.2,5h deg ,t79,1h*)
-c   103 format(1h*,2x,7h month:,i3,7h day : ,i3,t79,1h*)
-c  1110 format(1h*,2x,22h view zenith angle:   ,f6.2,5h deg ,
-c      s       29h view azimuthal angle:       ,f6.2,5h deg ,
-c      s      t79,1h*,/,
-c      s       1h*,2x,22h scattering angle:    ,f6.2,5h deg ,
-c      s           29h azimuthal angle difference: ,f6.2,5h deg ,
-c      s      t79,1h*)
-c  1119 format(1h*,t79,1h*,/,
-c      s       1h*,22x,31h atmospheric model description ,t79,1h*,/,
-c      s       1h*,22x,31h ----------------------------- ,t79,1h*)
-c  1261 format(1h*,10x,30h atmospheric model identity : ,t79,1h*,/,
-c      s       1h*,15x,a51,t79,1h*)
-c  1272 format(1h*,30h atmospheric model identity : ,t79,1h*,/,
-c      s       1h*,12x,33h user defined atmospheric model  ,t79,1h*,/,
-c      s       1h*,12x,11h*altitude  ,11h*pressure  ,
-c      s           11h*temp.     ,11h*h2o dens. ,11h*o3 dens.  ,t79,1h*)
-c  1271 format(1h*,12x,5e11.4,t79,1h*)
-c  1281 format(1h*,10x,31h atmospheric model identity :  ,t79,1h*,
-c      s     /,1h*,12x,35h user defined water content : uh2o=,f6.3,
-c      s                  7h g/cm2 ,t79,1h*,
-c      s     /,1h*,12x,35h user defined ozone content : uo3 =,f6.3,
-c      s                  7h cm-atm,t79,1h*)
-c 
-c 
-c  5550 format(1h*,10x,25h aerosols type identity :,t79,1h*)
-c  5551 format(1h*,11x,31h  user-defined aerosol profile:, I2,   
-c      s 7h layers,t79,1h*)
-c  5552 format(1h*,13x,46h Layer   Height(km)   Opt. thick.(at 0.55 mkm), 
-c      s 3x,7h  Model,t79,1h*)    
-c  5553 format(1h*,15x,I2,1x,f10.1,13x,f5.3,15x,A15,t79,1h*)
-c  5554 format(1h*,15x,20hno aerosols computed,t79,1h*) 
-c  5555 format(1h*,t79,1h*) 
-c  132  format(1h*,15x,a30,t79,1h*)         
-c  133  format(1h*,13x,28huser-defined aerosol model: ,t79,1h*,/,
-c      s  1h*,26x,f6.3,15h % of dust-like,t79,1h*,/,
-c      s  1h*,26x,f6.3,19h % of water-soluble,t79,1h*,/,
-c      s  1h*,26x,f6.3,13h % of oceanic,t79,1h*,/,
-c      s  1h*,26x,f6.3,10h % of soot,t79,1h*)
-c  134  format(1h*,13x,28huser-defined aerosol model: ,I2, 
-c      s 32h Log-Normal size distribution(s),t79,1h*,/,
-c      s 1h*,15x,43hMean radius   Stand. Dev.  Percent. density,
-c      s  t79,1h*)   
-c  135  format(1h*,t19,f6.4,T33,f5.3,T47,e8.3,T79,1h*)
-c  136  format(1h*,13x,27huser-defined aerosol model:, 
-c      s 33h modified Gamma size distribution,t79,1h*,/,
-c      s  1h*,19x,7hAlpha: ,f6.3,6h   b: ,f6.3,10h   Gamma: ,f6.3,t79,1h*)    
-c  137  format(1h*,13x,27huser-defined aerosol model:, 
-c      s 34h Junge Power-Law size distribution,t79,1h*,/,
-c      s  1h*,19x,7hAlpha: ,f6.3,t79,1h*)
-c  138  format(1h*,13x,42huser-defined aerosol model using data from,
-c      s  10h the file:,t79,1h*,/,1h*,20x,A30,T79,1h*)
-c  139  format(1h*,15x,29h results saved into the file:,t79,1h*,/,
-c      s  1h*,20x,A30,T79,1h*)
-c 
-c 
-c   140 format(1h*,10x,29h optical condition identity :,t79,1h*,/,
-c      s       1h*,15x,34h user def. opt. thick. at 550 nm :,f7.4,
-c      s       t79,1h*,/,1h*,t79,1h*)
-c   141 format(1h*,10x,29h optical condition identity :,t79,1h*,/,
-c      s       1h*,14x,13h visibility :,f6.2,4h km ,
-c      s                 22h opt. thick. 550 nm : ,f7.4,t79,1h*)
-c   142 format(1h*,t79,1h*,/,1h*,22x,
-c      s36h Surface polarization parameters    ,t79,1h*,/,1h*,
-c      s22x,36h ---------------------------------- ,t79,1h*,/,
-c      s1h*,t79,1h*)
-c   143 format(1h*,t79,1h*,/,1h*,
-c      s36h Surface Polarization Q,U,Rop,Chi   ,3(F8.5,1X),
-c      s F8.2,1X,t79,1h*,/,1h*,t79,1h*)
-c      
-c   144 format(1h*,t79,1h*,/,1h*,
-c      s36h Nadal and Breon with %  vegetation  ,1(F8.2,1X),
-c      s t79,1h*,/,1h*)
-c      
-c   145 format(1h*,t79,1h*,/,1h*,
-c      s36h  Sunglint Model  windspeed,azimuth ,2(F8.3,1X),
-c      s t79,1h*,/,1h*)
-c      
-c   146 format(1h*,t79,1h*,/,1h*,
-c      s36h  User's input roQ and roU          ,2(F8.3,1X),
-c      s t79,1h*,/,1h*)
-c   
-c   148 format(1h*,22x,21h spectral condition  ,t79,1h*,/,1h*,
-c      s             22x,21h ------------------  ,t79,1h*)   
-c 
-c   149 format(1h*,11x,32h monochromatic calculation at wl :,
-c      s                              f6.3,8h micron ,t79,1h*)
-c  1510 format(1h*,10x,a17,t79,1h*,/,
-c      s 1h*,15x,26hvalue of filter function :,t79,1h*,/,1h*,
-c      s 15x,8h wl inf=,f6.3,4h mic,2x,8h wl sup=,f6.3,4h mic,t79,1h*)
-c   168 format(1h*,t79,1h*,/,1h*,22x,14h target type  ,t79,1h*,/,1h*,
-c      s                         22x,14h -----------  ,t79,1h*,/,1h*,
-c      s                         10x,20h homogeneous ground ,t79,1h*)
-c   169 format(1h*,t79,1h*,/,1h*,22x,14h target type  ,t79,1h*,/,1h*,
-c      s                         22x,14h -----------  ,t79,1h*,/,1h*,
-c      s    10x,41h inhomogeneous ground , radius of target ,f6.3,
-c      s         5h km  ,t79,1h*)
-c   170 format(1h*,15x,22h target reflectance : ,t79,1h*)
-c   171 format(1h*,15x,29h environmental reflectance : ,t79,1h*)
-c   172 format(1h*,t79,1h*,/,79(1h*),///)
-c   173 format(1h*,t79,1h*,/,
-c      s       1h*,22x,30h target elevation description ,t79,1h*,/,
-c      s       1h*,22x,30h ---------------------------- ,t79,1h*)
-c   174 format(1h*,10x,22h ground pressure  [mb]    ,1x,f7.2,1x,t79,1h*)
-c   175 format(1h*,10x,22h ground altitude  [km]    ,f6.3,1x,t79,1h*)
-c   176 format(1h*,15x,34h gaseous content at target level: ,t79,1h*,
-c      s     /,1h*,15x,6h uh2o=,f6.3,7h g/cm2 ,
-c      s           5x,6h  uo3=,f6.3,7h cm-atm,t79,1h*)
-c   177 format(1h*,t79,1h*,/,
-c      s       1h*,23x,34h atmospheric correction activated ,t79,1h*,/,
-c      s       1h*,23x,34h -------------------------------- ,t79,1h*)
-c 
-c   220 format(1h*,23x,34h Lambertian assumption  selected  ,t79,1h*)
-c   221 format(1h*,23x,34h BRDF coupling correction         ,t79,1h*)
-c 
-c 
-c   185 format(1h*,10x,30h input apparent reflectance : , f6.3,t79,1h*)
-c   186 format(1h*,10x,39h input measured radiance [w/m2/sr/mic] ,
-c      s       f7.3,t79,1h*)
-c 
-c   187 format(1h*,t79,1h*,/,
-c      s       1h*,15x,34h brdf selected                    ,t79,1h*,/,
-c      s 1h*,15x,49h     rodir    robar    ropbar    robarbar  albedo 
-c      s        ,t79,1h*,/,
-c      s       1h*,15x,5(f9.5,1x),t79,1h*)
-c   190 format(1h*,15x,31h brdf from in-situ measurements,t79,1h*)
-c   191 format(1h*,15x,23h Hapke's model selected,t79,1h*
-c      s       /,1h*,16x,3hom:,f5.3,1x,3haf:,f5.3,1x,3hs0:,f5.3,1x,
-c      s       2hh:,f5.3,t79,1h*)
-c   192 format(1h*,15x,38h Pinty and Verstraete's model selected,t79,1h*
-c      s       /,1h*,16x,3hom:,f5.3,1x,5hrad :,f5.3,1x,6hlad  :,f5.3,1x,
-c      s        t79,1h*)
-c   193 format(1h*,15x,32h Roujean et al.'s model selected,t79,1h*
-c      s       /,1h*,16x,3hk0:,f5.3,1x,3hk1:,f5.3,1x,3hk2:,f5.3,
-c      s       t79,1h*)
-c   194 format(1h*,15x,33h Walthall et al.'s model selected,t79,1h*
-c      s       /,1h*,16x,2ha:,f5.3,1x,3hap:,f5.3,1x,2hb:,f5.3,1x,
-c      s       3hom:,f5.3,t79,1h*)
-c   195 format(1h*,15x,26h Minnaert's model selected,t79,1h*
-c      s       /,1h*,16x,5hpar1:,f5.3,1x,5hpar2:,f5.3,t79,1h*)
-c   196 format(1h*,15x,21h ocean model selected,t79,1h*
-c      s       /,1h*,16x,18hwind speed [m/s] :,f5.1,
-c      s             2x,27hazimuth of the wind [deg] :,f8.2,t79,1h*
-c      s       /,1h*,16x,16hsalinity [ppt] :,f5.1,
-c      s             4x,23hpigment conc. [mg/m3] :,f6.2,t79,1h*)
-c   197 format(1h*,15x,41h given kappa1 and kappa2:                ,t79,
-c      s    1h*,/,1h*,20x,5hkpa1:,f5.3,1x,5hkpa2:,f5.3,t79,1h*)
-c   198 format(1h*,15x,41h Goudrian's parametrization of kappa :   ,t79,
-c      s   1h*,/,1h*,20x,6h ksil:,f5.3,1x,t79,1h*)
-c   199 format(1h*,15x,41h modified Goudrian's parametrization :   ,t79,
-c      s   1h*,/,1h*,20x,6h ksil:,f5.3,1x,t79,1h*)
-c   200 format(1h*,15x,40h single scattering only              :  ,t79,
-c      s   1h*)
-c   201 format(1h*,15x,40h multiple scattering (Dickinson et al)  ,t79,
-c      s   1h*)
-c   202 format(1h*,15x,40h isotropic phase function            :  ,t79,
-c      s   1h*)
-c   203 format(1h*,15x,40h Heyney-Greenstein's phase function  :  ,t79,
-c      s   1h*,/,1h*,20x,6hassym:,f5.3,1x,t79,1h*)
-c   204 format(1h*,15x,40h Legendre polynomial phase function  :  ,t79,
-c      s   1h*,/,1h*,20x,6hbeta1:,f5.3,1x,6hbeta2:,f5.3,t79,1h*)
-c   205 format(1h*,15x,40h Iaquinta and Pinty BRDF model selected ,t79,
-c      s       1h*,/,1h*,16x,3hRl:,f5.3,1x,3hTl:,f5.3,1x,3hRs:,f5.3,1x
-c      s       ,1x,4hLAl:,f5.3,t79,1h*)
-c   206 format(1h*,15x,30h Rahman et al. model selected ,t79,
-c      s       1h*,/,1h*,16x,4hRho0:,f6.3,1x,2haf:,f6.3,1x,3hxk:,f6.3,1x
-c      s       ,t79,1h*)
-c   207 format(1h*,15x,A19,t79,1h*)
-c   208 format(1h*,15x,A19,1x,f5.2,t79,1h*)
-c   209 format(1h*,15x,A31,t79,1h*)
-c   210 format(1h*,2x,40h Kuusk BRDF model,                      ,t79,1h*,
-c      s       /,1h*,12x,4hLAI:,f5.3,2x,4heps:,f6.4,2x,4hthm:,f4.1
-c      s       ,1x,3hsl:,f4.2,t79,1h*,
-c      s       /,1h*,12x,4hcAB:,f6.2,1x,3hcW:,f5.3,1x,2hN:,f5.3,1x,3hcn:
-c      s       ,f4.2,1x,5hrsl1:,f5.3,t79,1h*)
-c   211 format(1h*,15x,30h MODIS BRDF    model selected ,t79,
-c      s       1h*,/,1h*,16x,4h  p1:,f6.3,1x,3hp2:,f6.3,1x,3hp3:,f6.3,1x
-c      s       ,t79,1h*)
-c   212 format(1h*,15x,30h RossLiMaignan model selected ,t79,
-c      s       1h*,/,1h*,16x,4h  p1:,f6.3,1x,3hp2:,f6.3,1x,3hp3:,f6.3,1x
-c      s       ,t79,1h*)
-c 
-c c pressure at ground level (174) and altitude (175)
-c   178 format(1h*,t79,1h*,/,
-c      s       1h*,22x,30h plane simulation description ,t79,1h*,/,
-c      s       1h*,22x,30h ---------------------------- ,t79,1h*)
-c   179 format(1h*,10x,31h plane  pressure          [mb] ,f7.2,1x,t79,1h*)
-c   180 format(1h*,10x,31h plane  altitude absolute [km] ,f6.3,1x,t79,1h*)
-c   181 format(1h*,15x,37h atmosphere under plane description: ,t79,1h*)
-c   182 format(1h*,15x,26h ozone content            ,f6.3,1x,t79,1h*)
-c   183 format(1h*,15x,26h h2o   content            ,f6.3,1x,t79,1h*)
-c   184 format(1h*,15x,26haerosol opt. thick. 550nm ,f6.3,1x,t79,1h*)
-c  
-c   426 format(1h*,t79,1h*,/,
-c      s       1h*,24x,27h coupling aerosol -wv  :   ,t79,1h*,/,
-c      s       1h*,24x,27h --------------------      ,t79,1h*,/,
-c      s       1h*,10x,20h wv above aerosol : ,f5.3,4x,
-c      s               25h wv mixed with aerosol : ,f5.3,1x,t79,1h*,/,
-c      s       1h*,22x,20h wv under aerosol : ,f5.3,t79,1h*,/,1h*,t79,
-c      s 1h*,/,1h*,24x,34h coupling polarized aerosol -wv  :,t79,1h*,/,
-c      s       1h*,24x,34h ------------------------------   ,t79,1h*,/,
-c      s       1h*,10x,20h wv above aerosol : ,f5.3,4x,
-c      s               25h wv mixed with aerosol : ,f5.3,1x,t79,1h*,/,
-c      s       1h*,22x,20h wv under aerosol : ,f5.3,t79,1h*)
-c   427 format(79(1h*),/,1h*,t79,1h*,/,
-c      s       1h*,24x,27h integrated values of  :   ,t79,1h*,/,
-c      s       1h*,24x,27h --------------------      ,t79,1h*,/,
-c      s       1h*,t79,1h*,/,
-c      s       1h*,6x,22h apparent reflectance ,f9.2,1x,
-c      s                 26h appar. rad.(w/m2/sr/mic) ,f10.3,1x,t79,1h*,/,
-c      s       1h*,6x,22h app. polarized refl. ,f7.4,3x,
-c      s                 26h app. pol. rad. ( "  "  ) ,f10.3,1x,t79,1h*,/,
-c      s       1h*,12x,39h direction of the plane of polarization,
-c      s       f6.2,t79,1h*,/,
-c      s       1h*,18x,30h total gaseous transmittance  ,f5.3,t79,1h*,/,
-c      s       1h*,t79,1h*,/,79(1h*))
-c   428 format(1h*,t79,1h*,/,
-c      s 1h*,24x,34h coupling polarized aerosol -wv  :,t79,1h*,/,
-c      s       1h*,24x,34h ------------------------------   ,t79,1h*,/,
-c      s       1h*,10x,20h wv above aerosol : ,f5.3,4x,
-c      s               25h wv mixed with aerosol : ,f5.3,1x,t79,1h*,/,
-c      s       1h*,22x,20h wv under aerosol : ,f5.3,t79,1h*)
-c   429 format(79(1h*),/,1h*,t79,1h*,/,
-c      s       1h*,24x,27h integrated values of  :   ,t79,1h*,/,
-c      s       1h*,24x,27h --------------------      ,t79,1h*,/,
-c      s       1h*,t79,1h*,/,
-c      s       1h*,6x,22h app. polarized refl. ,f7.4,3x,
-c      s       30h app. pol. rad. (w/m2/sr/mic) ,f8.3,
-c      s       1x,t79,1h*,/,
-c      s       1h*,12x,39h direction of the plane of polarization,
-c      s       f6.2,t79,1h*,/,
-c      s       1h*,18x,30h total polarization ratio     ,f5.3,t79,1h*,/,
-c      s       1h*,t79,1h*,/,79(1h*))
-c   430 format(79(1h*),/,1h*,t79,1h*,/,
-c      s       1h*,24x,27h integrated values of  :   ,t79,1h*,/,
-c      s       1h*,24x,27h --------------------      ,t79,1h*,/,
-c      s       1h*,t79,1h*,/,
-c      s       1h*,6x,22h apparent reflectance ,f10.7,1x,
-c      s                 26h appar. rad.(w/m2/sr/mic) ,f8.3,1x,t79,1h*,/,
-c      s       1h*,18x,30h total gaseous transmittance  ,f5.3,
-c      s  t79,1h*,/,1h*,t79,1h*,/,79(1h*))
-c   500 format(1h*,6x,40h water reflectance components:           ,
-c      s       t79,1h*,/,
-c      s       1h*,6x,10h Foam:    ,1x, f10.5,1x
-c      s              ,10h Water:   ,1x, f10.5,1x
-c      s              ,10h Glint:   ,1x, f10.5,1x,t79,1h*)
-c   431 format(1h*,t79,1h*,/,
-c      s       1h*,24x,27h coupling aerosol -wv  :   ,t79,1h*,/,
-c      s       1h*,24x,27h --------------------      ,t79,1h*,/,
-c      s       1h*,10x,20h wv above aerosol : ,f7.3,4x,
-c      s               25h wv mixed with aerosol : ,f7.3,1x,t79,1h*,/,
-c      s       1h*,22x,20h wv under aerosol : ,f7.3,t79,1h*)
-c   432 format(1h*,t79,1h*,/,1h*,
-c      s        24x,32h int. normalized  values  of  : ,t79,1h*,/,1h*,
-c      s        24x,32h ---------------------------    ,t79,1h*,/,1h*,
-c      s             22x,31h% of irradiance at ground level,
-c      s  t79,1h*,/,1h*,5x,17h% of direct  irr.,
-c      s                    4x,17h% of diffuse irr.,
-c      s                    4x,17h% of enviro. irr ,t79,1h*,/,
-c      s             1h*,3(10x,f10.3),t79,1h*,/,
-c      s 1h*,22x,31h reflectance at satellite level  ,t79,1h*,/,
-c      s                1h*,5x,17hatm. intrin. ref.,
-c      s                    3x,a11,5h ref.,
-c      s                    2x,a6,12h reflectance,t79,1h*,/,
-c      s             1h*,3(10x,f10.3),t79,1h*,/,1h*,t79,1h*)
   432 format (3(f0.3, 1x), 3(f0.3, 1x))
-c   436 format(1h*,t79,1h*,/,1h*,22x,24hsol. spect (in w/m2/mic),t79,1h*,
-c      s/,1h*,30x,f10.3,t79,1h*,/,1h*,t79,1h*,/,79(1h*))
-c   437 format(1h*,t79,1h*,/,1h*,10x,29hint. funct filter (in mic)
-c      s               ,10x,26h int. sol. spect (in w/m2),t79,1h*,/,
-c      s1h*,10x,f12.7,30x,f10.3,t79,1h*,/,1h*,t79,1h*,/,79(1h*))
-c   434 format(1h*,24x,24h int. absolute values of,t79,
-c      s 1h*,/,1h*,24x,24h -----------------------               ,
-c      s  t79,1h*,/,1h*,22x,33hirr. at ground level (w/m2/mic)  ,
-c      s  t79,1h*,/,1h*, 5x,17hdirect solar irr.,
-c      s             4x,17hatm. diffuse irr.,
-c      s             4x,17henvironment  irr ,t79,1h*,/,
-c      s             1h*,3(10x,f10.3),t79,1h*,/,
-c      s        1h*,22x,33hrad at satel. level (w/m2/sr/mic),t79,1h*,/,
-c      s                1h*,5x,17hatm. intrin. rad.,
-c      s                    4x,a11,5h rad.,
-c      s                    4x,a6,9h radiance,t79,1h*,/,
-c      s             1h*,3(10x,f10.3),t79,1h*,/,1h*,t79,1h*)
-c   929 format(1h ,////)
-c   930 format(79(1h*),/,1h*,t79,1h*,/,
-c      s       1h*,t27,27h integrated values of  :   ,t79,1h*,/,
-c      s       1h*,t27,27h --------------------      ,t79,1h*,/,
-c      s       1h*,t79,1h*,/,
-c      s       1h*,t30,10h downward ,t45,10h  upward  ,
-c      s            t60,10h   total  ,t79,1h*)
-c   931 format(1h*,6x,a20,t32,f8.5,t47,f8.5,t62,f8.5,t79,1h*)
   931 format(f0.5, 1x)
-c   932 format(1h*,6x,a20,t32,f8.2,t47,f8.2,t62,f8.2,t79,1h*)
-c   939 format(1h*,t79,1h*,/,1h*,
-c      s             t30,10h rayleigh ,t45,10h aerosols ,
-c      s            t60,10h   total  ,t79,1h*,/,1h*,t79,1h*)
-c   940 format(79(1h*),/,/,/,/,79(1h*),/
-c      s       1h*,23x,31h atmospheric correction result ,t79,1h*,/,
-c      s       1h*,23x,31h ----------------------------- ,t79,1h*)
-c   941 format(1h*,6x,40h input apparent reflectance            :, 
-c      s           1x, f8.3, t79,1h*)
-c   942 format(1h*,6x,40h measured radiance [w/m2/sr/mic]       :, 
-c      s           1x, f8.3, t79,1h*)
-c   943 format(1h*,6x,40h atmospherically corrected reflectance :,
-c      s           1x, f8.3, t79,1h*)
-c   222 format(1h*,6x,40h atmospherically corrected reflectance  ,
-c      s       t79,1h*,/,
-c      s       1h*,6x,20h Lambertian case :  ,1x, f10.5, t79,1h*,/,
-c      s       1h*,6x,20h BRDF       case :  ,1x, f10.5, t79,1h*)
-c   944 format(1h*,6x,40h coefficients xa xb xc                 :, 
-c      s           1x, 3(f8.5,1x),t79,1h*,/,1h*,6x,
-c      s           ' y=xa*(measured radiance)-xb;  acr=y/(1.+xc*y)',
-c      s               t79,1h*)
-c   945 format(1h*,6x,40h coefficients xap xb xc                :, 
-c      s           1x, 3(f9.6,1x),t79,1h*,/,1h*,6x,
-c      s           ' y=xap*(measured reflectance)-xb;  acr=y/(1.+xc*y)',
-c      s               t79,1h*,/,79(1h*))
-c  1401 format(1h*,t79,1h*)
-c  1402 format(1h*,t79,1h*,/,79(1h*))
  1500 format(1h*,1x,42hwave   total  total  total  total  atm.   ,
      s           33hswl    step   sbor   dsol   toar ,t79,1h*,/,
      s  1h*,1x,42h       gas    scat   scat   spheri intr   ,t79,1h*,/,
      s  1h*,1x,42h       trans  down   up     albedo refl   ,t79,1h*)
  1501 format(1h*,6(F6.4,1X),F6.1,1X,4(F6.4,1X),t79,1h*)
-c  1502 format(1h*,6(F5.3,1X),F6.1,1X,1(F6.4,1X),t79,1h*)
-c  1503 format(1h*,6x,5(F5.3,1X),F6.1,1X,1(F6.4,1X),t79,1h*)
-c 
+
         end

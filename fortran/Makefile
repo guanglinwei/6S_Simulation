@@ -1,5 +1,5 @@
 SHELL = /bin/sh
-EXTRA	= -g -ffixed-line-length-132 -O -ffixed-line-length-132 $(additional_fflags)
+EXTRA	= -g -ffixed-line-length-132 -O -ffixed-line-length-132 -std=legacy -ffixed-line-length-none
 FFLAGS=  $(EXTRA)
 CFLAGS = -Ae $(EXTRA)
 #FC      = g95 $(FFLAGS)

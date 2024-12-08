@@ -10,7 +10,7 @@ import os
 from netCDF4 import Dataset
 import random
 
-def run_fortran_executable(executable_path, input_params: tuple, input_indices: tuple = None, output_mask = None, BLOCK=True):
+def run_fortran_executable(executable_path, input_params: tuple, input_indices: tuple = None, output_mask = None, BLOCK=True, LOG=False):
     """
     Runs a Fortran executable with an input file and writes output to an output file.
     
@@ -69,21 +69,22 @@ def run_fortran_executable(executable_path, input_params: tuple, input_indices: 
             output_mask[4, sza_i, vza_i, raa_i, aod_i, band_i] = spherical_albedo
             output_mask[5, sza_i, vza_i, raa_i, aod_i, band_i] = optical_depth
             output_mask[6, sza_i, vza_i, raa_i, aod_i, band_i] = direct_irradiance_ratio
-        
-    # print(f'Simulation results for:\n' + \
-    #         f' sza={sza:.2f}\n' + \
-    #         f' vza={vza:.2f}\n' + \
-    #         f' raa={raa:.2f}\n' + \
-    #         f' aod={aod:.2f}\n' + \
-    #         f' band={band}\n' + \
-    #         '  \\/\n' + \
-    #         f'direct_irradiance_ratio={direct_irradiance_ratio}\n' + \
-    #         f'atmospheric_path_reflectance={atmospheric_path_reflectance}\n' + \
-    #         f'gaseous_transmittance={gaseous_transmittance}\n' + \
-    #         f'downward_scattering_transmittance={downward_scattering_transmittance}\n' + \
-    #         f'upward_scattering_transmittance={upward_scattering_transmittance}\n' + \
-    #         f'spherical_albedo={spherical_albedo}\n' + \
-    #         f'optical_depth={optical_depth}\n---\n')
+    
+    if LOG:    
+        print(f'Simulation results for:\n' + \
+                f' sza={sza:.2f}\n' + \
+                f' vza={vza:.2f}\n' + \
+                f' raa={raa:.2f}\n' + \
+                f' aod={aod:.2f}\n' + \
+                f' band={band}\n' + \
+                '  \\/\n' + \
+                f'direct_irradiance_ratio={direct_irradiance_ratio}\n' + \
+                f'atmospheric_path_reflectance={atmospheric_path_reflectance}\n' + \
+                f'gaseous_transmittance={gaseous_transmittance}\n' + \
+                f'downward_scattering_transmittance={downward_scattering_transmittance}\n' + \
+                f'upward_scattering_transmittance={upward_scattering_transmittance}\n' + \
+                f'spherical_albedo={spherical_albedo}\n' + \
+                f'optical_depth={optical_depth}\n---\n')
     
     # with open(output_file, 'r') as outfile:     
     #     all_output_text = outfile.read()
@@ -126,15 +127,21 @@ def create_input_text(sza, vza, raa, aod, band):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Run Fortran executable with parameter combinations")
-    parser.add_argument("--make", action="store_true", default=False, help="Make the 6s executable from scratch")
+    parser.add_argument('-d', '--directory', dest='sixs_dir', type=str, default='./fortran', help='6S code directory. Defaults to ./fortran')
+    parser.add_argument("--make", action="store_true", default=False, help="Make the 6s executable from scratch.")
+    parser.add_argument('--no-save', action='store_true', dest='no_save', default=False, help='Don\'t save to lookup table.')
     args = parser.parse_args()
+    
+    if not os.path.exists(args.sixs_dir) or not os.path.isdir(args.sixs_dir):
+        parser.error(f'{args.sixs_dir} is not a directory or does not exist.')
+        
     if args.make:
-        subprocess.run('cd fortran && make additional_fflags="-std=legacy -ffixed-line-length-none" && make clean && cd ..', shell=True)
+        subprocess.run(f'cd {args.sixs_dir} && make && make clean && cd ..', shell=True)
         
     # Define paths and list of input files
     executable_path = None
     pattern = re.compile(r".*sixsV\d+\.\d+")
-    for file in Path('./fortran').iterdir():
+    for file in Path(args.sixs_dir).iterdir():
         if file.is_file() and pattern.fullmatch(file.name):
             executable_path = file
             file.chmod(0o755)
@@ -143,6 +150,7 @@ if __name__ == '__main__':
         
     if executable_path is None:
         print('Executable for 6S not found. Consider running with --make')
+        quit()
     
     # subprocess.run('ls')
     # subprocess.run(f'cd fortran && chmod +x "{executable_path.name}" && cd ..')
@@ -175,7 +183,7 @@ if __name__ == '__main__':
     # print(output_mask.shape)
     
     nc_filepath = os.path.join(output_dir, 'lutabi.nc')
-    if not os.path.exists(nc_filepath):
+    if not args.no_save and not os.path.exists(nc_filepath):
         print('Creating NC file')
         with Dataset(os.path.join(output_dir, 'lutabi.nc'), 'w', format='NETCDF4') as nc:
             nc.createDimension('NumVars', 7)
@@ -229,22 +237,30 @@ if __name__ == '__main__':
                 target_vza_ind = 15
             else: 
                 target_vza_ind = last_save_lut_ind - 1
-                
-            print('Saving block...', target_sza_ind, target_vza_ind)
-            print(' ', np.count_nonzero(lut_block))
-            with Dataset(nc_filepath, 'a') as nc:
-                lut = nc.variables['Lutvars']
-                lut[:, target_sza_ind, target_vza_ind, :, :, :] = lut_block
-                
-            lut_block[:] = 0
-            print('Saved')
+            
+            if not args.no_save:    
+                print('Saving block...', target_sza_ind, target_vza_ind)
+                print(' ', np.count_nonzero(lut_block))
+                with Dataset(nc_filepath, 'a') as nc:
+                    lut = nc.variables['Lutvars']
+                    lut[:, target_sza_ind, target_vza_ind, :, :, :] = lut_block
+                    
+                lut_block[:] = 0
+                print('Saved')
         
         # output_path = output_dir / f"{count}_output_test.txt"
         # print(input_text)
         # thread = threading.Thread(target=run_fortran_executable, args=(executable_path, (sza, vza, raa, aod, band), output_path))
         
         # thread.start()
-        run_fortran_executable(executable_path, (sza, vza, raa, aod, band), input_indices=indices, output_mask=lut_block, BLOCK=True)
+        run_fortran_executable(
+            executable_path, 
+            (sza, vza, raa, aod, band), 
+            input_indices=indices, 
+            output_mask=lut_block, 
+            BLOCK=True,
+            LOG=args.no_save
+        )
         # print(f"Processed {input_path} -> {output_path}")
     # print(output_mask[0, 0, 0, 0, 0, 0])
 

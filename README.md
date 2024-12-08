@@ -31,20 +31,17 @@ Outputs default to the `f_out` directory.
 Run `python srf_txt_to_fortran.py -h` to see more options.
 
 ### Add Fortran Code to Simulation
-Adds the SRF Fortran programs to the Makefile of 6S.
-`python edit_6s_code.py -r`
-- Defaults to reading from the `f_out` directory. Use `-r [DIRECTORY]` to change it.
+Creates the modified 6S code. By default, outputs to `fortran` directory.
+
+`python edit_6s_code.py -o -r`
+- Defaults to reading from the `f_out` directory for SRFs and the `base_fortran` directory for 6S code. 
 
 Run `python edit_6s_code.py -h` to see more options.
-
-### Additional Steps
-Currently, you must manually some additional code to `fortran/main.f`. 
-Look at lines 1365-1465 and follow the existing format. 
-
-This will be made automatic in the future.
 
 ## Creating the Lookup Table
 - `python run.py --make`
 
 This will compile the 6S code and create the lookup table in blocks.
 Run without the `--make` option if you have already compiled the 6S executable. 
+
+Run `python run.py -h` to see more options.

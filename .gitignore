@@ -2,6 +2,9 @@
 venv
 outputs/
 test_lut.py
+check_lut_graph.py
+__pycache__
+temp/
 
 .vscode/*
 .DS_Store
