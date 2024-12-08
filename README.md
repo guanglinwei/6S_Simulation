@@ -39,7 +39,7 @@ Creates the modified 6S code. By default, outputs to `fortran` directory.
 Run `python edit_6s_code.py -h` to see more options.
 
 ## Creating the Lookup Table
-- `python run.py --make`
+`python run.py --make`
 
 This will compile the 6S code and create the lookup table in blocks.
 Run without the `--make` option if you have already compiled the 6S executable. 
