@@ -20,7 +20,7 @@ if __name__ == '__main__':
         help='Directory to read Fortran files from.'
     )
     parser.add_argument(
-        '-o', '--override',
+        '-e', '--override',
         dest='override',
         default=False,
         action='store_true',

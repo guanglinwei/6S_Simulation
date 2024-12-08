@@ -140,6 +140,15 @@ def output_f_file(left_pad, right_pad, resampled_srfs, filename, comment=None, o
              '    1 continue\n      wlinf=wli(iwa)\n      wlsup=wls(iwa)\n' + \
              '      return\n      end\n\n'
         )
+        
+def convert_all_srf_to_f(input_files, output_filenames, out_dir):
+    for input_file, output_file in zip(input_files, output_filenames):
+        wavelengths, srfs = parse_srf(input_file)
+        left_pad, right_pad, resampled_srfs = resample_srf(wavelengths, srfs)
+        
+        output_f_file(left_pad, right_pad, resampled_srfs, output_file, 
+                      comment=f'Generated from {os.path.basename(input_file)}',
+                      output_dir=out_dir)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Convert SRF text files to Fortran code.")
@@ -147,8 +156,16 @@ if __name__ == '__main__':
         '-i', '--input-files',
         dest="input_files", 
         nargs="+", 
-        required=True,
+        required=False,
         help="Paths to input SRF text files."
+    )
+    parser.add_argument(
+        '-r', '--recursive',
+        dest='recursive_dir',
+        nargs='?',
+        const='./srf/', 
+        type=str,       
+        help='Directory to read Fortran files from.'
     )
     parser.add_argument(
         '-o', '--output-files',
@@ -158,7 +175,7 @@ if __name__ == '__main__':
         help="Names of output Fortran files."
     )
     parser.add_argument(
-        '-r', '--override',
+        '-e', '--override',
         dest='override',
         default=False,
         action='store_true',
@@ -180,30 +197,42 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
+    if not args.input_files and not args.recursive_dir:
+        parser.error('Must either provide separate input files with -i <input_files> or a directory with -r <directory>. Use -h for more info.')
+    
+    if args.input_files and args.recursive_dir:
+        print('Both file list and directory are provided. Ignoring the directory and only using provided input files.')
+    
+    input_files = []
+    if args.input_files:
+        input_files = args.input_files
+    else:
+        for filename in os.scandir(args.recursive_dir):
+            if filename.is_file():
+                input_files.append(filename.path)
+      
     # Ensure equal number of input and output files
-    if len(args.input_files) != len(args.output_files):
+    if len(input_files) != len(args.output_files):
         raise ValueError("Number of input files must equal number of output files.")
     
     # if not os.path.isdir(args.out_dir):
         # parser.error(f'{args.out_dir} is not a directory.')
 
-    for in_file in args.input_files:
+    for in_file in input_files:
         if not os.path.exists(in_file) or not os.path.isfile(in_file):
             parser.error(f'{in_file} does not exist or is not a file.')
-            
+    
+    output_files = []
     for out_file in args.output_files:
-        if os.path.splitext(out_file)[1] != '.f':
+        ext = os.path.splitext(out_file)[1]
+        if ext == '':
+            out_file += '.f'
+        elif ext != '.f':
             parser.error(f'{out_file} is not a valid fortran file. Must end with ".f".')
             
         out_name, _, _ = format_f_filename(out_file)
         if os.path.exists(os.path.join(args.out_dir, out_name)) and not args.override:
             parser.error(f'{os.path.join(args.out_dir, out_name)} already exists. Please use the --override flag to write over the existing file.')
             
-
-    for input_file, output_file in zip(args.input_files, args.output_files):
-        wavelengths, srfs = parse_srf(input_file)
-        left_pad, right_pad, resampled_srfs = resample_srf(wavelengths, srfs)
-        
-        output_f_file(left_pad, right_pad, resampled_srfs, output_file, 
-                      comment=f'Generated from {os.path.basename(input_file)}',
-                      output_dir=args.out_dir)
+        output_files.append(out_file)
+    convert_all_srf_to_f(input_files, output_files, args.out_dir)

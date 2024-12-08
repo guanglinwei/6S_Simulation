@@ -22,18 +22,26 @@ Otherwise, follow [these instructions](https://fortran-lang.org/en/learn/os_setu
 ### SRF to Fortran Conversion
 Converts a spectral response function text file to a Fortran program.
 
-`python srf_txt_to_fortran.py -i [INPUT_FILES] -o [OUTPUT_FILES]`
-- `INPUT_FILES`: paths to the SRF text files. Ex: `-i srf/GOES-R_ABI_PFM_SRF_CWG_ch1.txt srf/GOES-R_ABI_PFM_SRF_CWG_ch2.txt`
-- `OUTPUT_FILES`: names of output files. Ex: `-o goesr1.f goesr2.f`
+`python srf_txt_to_fortran.py -r [INPUT_DIRECTORY] -o [OUTPUT_FILENAMES]`
+- `-r [INPUT_DIRECTORY]`: directory to read SRF files from.
+- `-o [OUTPUT_FILES]`: names of output files. Must have same number of entries as files in input directory.
+Ex: `-o goesr1 goesr2 goesr3 goesr5 goesr6`
 
 Outputs default to the `f_out` directory.
 
 Run `python srf_txt_to_fortran.py -h` to see more options.
 
+If you would like to convert SRFs in code:
+```python
+from srf_txt_to_fortran import convert_all_srf_to_f
+
+convert_all_srf_to_f(['srf1.txt', 'srf2.txt'], ['out1', 'out2'], './f_out')
+```
+
 ### Add Fortran Code to Simulation
 Creates the modified 6S code. By default, outputs to `fortran` directory.
 
-`python edit_6s_code.py -o -r`
+`python edit_6s_code.py -e -r`
 - Defaults to reading from the `f_out` directory for SRFs and the `base_fortran` directory for 6S code. 
 
 Run `python edit_6s_code.py -h` to see more options.
