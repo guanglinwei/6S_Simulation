@@ -50,7 +50,8 @@ if __name__ == '__main__':
 
     # Ensure fortran directories exist and are different
     if not os.path.isdir(args.out_dir):
-        parser.error(f'{args.out_dir} is not a valid directory or does not exist.')
+        os.mkdir(args.out_dir)
+        # parser.error(f'{args.out_dir} is not a valid directory or does not exist.')
         
     if not os.path.isdir(args.in_dir):
         parser.error(f'{args.in_dir} is not a valid directory or does not exist.')
@@ -130,8 +131,6 @@ if __name__ == '__main__':
     out_makefile_path = os.path.join(args.out_dir, 'Makefile')
     if not os.path.exists(in_makefile_path) or not os.path.isfile(in_makefile_path):
         parser.error(f'Could not find Makefile: {in_makefile_path} is not a path or does not exist.')
-    if not os.path.exists(out_makefile_path) or not os.path.isfile(out_makefile_path):
-        parser.error(f'Could not find Makefile: {out_makefile_path} is not a path or does not exist.')
     
     replaced_extra_cflags = False
     with open(in_makefile_path, 'r') as f:
@@ -195,6 +194,9 @@ if __name__ == '__main__':
     # Edit main.f
     in_main_path = os.path.join(args.in_dir, 'main.f')
     out_main_path = os.path.join(args.out_dir, 'main.f')
+    if not os.path.exists(in_main_path) or not os.path.isfile(in_main_path):
+        parser.error(f'Could not find main.f: {in_main_path} is not a path or does not exist.')
+        
     with open(in_main_path, 'r')  as f:
         main_lines = f.readlines()
         

@@ -5,6 +5,8 @@ test_lut.py
 check_lut_graph.py
 __pycache__
 temp/
+fortran/
+f_out/
 
 .vscode/*
 .DS_Store
