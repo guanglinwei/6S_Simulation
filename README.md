@@ -22,10 +22,9 @@ Otherwise, follow [these instructions](https://fortran-lang.org/en/learn/os_setu
 ### SRF to Fortran Conversion
 Converts a spectral response function text file to a Fortran program.
 
-`python srf_txt_to_fortran.py -r [INPUT_DIRECTORY] -o [OUTPUT_FILENAMES]`
+`python srf_txt_to_fortran.py -r srf -o goesr1 goesr2 goesr3 goesr5 goesr6`
 - `-r [INPUT_DIRECTORY]`: directory to read SRF files from.
 - `-o [OUTPUT_FILES]`: names of output files. Must have same number of entries as files in input directory.
-Ex: `-o goesr1 goesr2 goesr3 goesr5 goesr6`
 
 Outputs default to the `f_out` directory.
 
