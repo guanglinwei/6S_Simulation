@@ -9,6 +9,7 @@ import threading
 import os
 from netCDF4 import Dataset
 import random
+import json
 
 def run_fortran_executable(executable_path, input_params: tuple, input_indices: tuple = None, output_mask = None, BLOCK=True, LOG=False):
     """
@@ -155,21 +156,20 @@ if __name__ == '__main__':
     # subprocess.run('ls')
     # subprocess.run(f'cd fortran && chmod +x "{executable_path.name}" && cd ..')
         
+    with open('./new_srfs.json', 'r') as json_f:
+        data = json.load(json_f)
+        band_range = range(data['start_band_index'], data['start_band_index'] + len(data['new_srfs']))
+        band_names = data['new_srfs']
+    
     input_params = [
         rangef_inc(0, 0.75, 0.05), # SZA
         rangef_inc(0, 0.75, 0.05), # VZA
         range(0, 180+1, 30), # RAA
         [0.01, 0.05, 0.1, 0.15, 0.2, 0.3, 0.4, 0.6, 0.8, 1.0], # AOD
-        # range(42, 42+6+1), # Band
-        range(200, 204+1),# Band
-        # [1, 2, 3, 5, 6], # Band (GOES-R ABI. needs fixing, must manually input)
+        band_range
     ]
     
     input_indices = [list(range(len(param))) for param in input_params]
-    
-    # input_params = [
-    #     0.10, 0.20, 30, 0.1, 200
-    # ]
 
     shape = [len(x) for x in input_params]
     size = reduce(lambda a, c: a * c, shape, 1) * 7
@@ -179,8 +179,6 @@ if __name__ == '__main__':
 
     # Run the executable on each input file
     count = 0
-    # output_mask = np.zeros(shape=(7, *(len(param) for param in input_params)))
-    # print(output_mask.shape)
     
     nc_filepath = os.path.join(output_dir, 'lutabi.nc')
     if not args.no_save and not os.path.exists(nc_filepath):
@@ -209,7 +207,7 @@ if __name__ == '__main__':
             vza_var[:] = np.array(input_params[1])
             rai_var[:] = np.array(input_params[2])
             aod_var[:] = np.array(input_params[3])
-            band_var[:] = np.array([1, 2, 3, 5, 6])
+            band_var[:] = np.array(input_params[4])
             table_var[:] = np.zeros(shape=(7, *(len(param) for param in input_params)))
     
     lut_block = np.zeros(shape=(7, *(shape[-3:])))
@@ -227,8 +225,7 @@ if __name__ == '__main__':
         sza, vza, raa, aod, band = [input_params[i][v] for i, v in enumerate(indices)]
         if indices[0] < RESUME_BLOCK[0] or (indices[0] == RESUME_BLOCK[0] and indices[1] < RESUME_BLOCK[1]):
             continue
-        
-        
+                
         if indices[1] != last_save_lut_ind:
             last_save_lut_ind = indices[1]
             target_sza_ind = indices[0]
@@ -261,10 +258,5 @@ if __name__ == '__main__':
             BLOCK=True,
             LOG=args.no_save
         )
-        # print(f"Processed {input_path} -> {output_path}")
-    # print(output_mask[0, 0, 0, 0, 0, 0])
 
-        
     print('Done')
-    
-# TODO: plot the SRFs comparison to original
