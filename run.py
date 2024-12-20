@@ -5,11 +5,11 @@ from functools import reduce
 import numpy as np
 import re
 import argparse
-import threading
 import os
 from netCDF4 import Dataset
-import random
 import json
+from concurrent.futures import ProcessPoolExecutor, as_completed
+import time
 
 def run_fortran_executable(executable_path, input_params: tuple, input_indices: tuple = None, output_mask = None, BLOCK=True, LOG=False):
     """
@@ -100,7 +100,7 @@ def run_fortran_executable(executable_path, input_params: tuple, input_indices: 
     #             f' band={band}\n' + \
     #             f'={direct_irr_percent}')
     
-    
+    return input_indices or input_params
             
 def rangef_inc(min, max, step):
     epsilon = step / 100
@@ -125,18 +125,33 @@ def create_input_text(sza, vza, raa, aod, band):
 '''
     return text
 
+def process_block(sza, vza, sza_index, vza_index, block_param_values, block_param_indices, LOG):
+    lut_block = np.zeros(shape=(7, *(shape[-(len(block_param_indices)):])))
+    for indices in product(*block_param_indices):
+        raa, aod, band = [block_param_values[i][v] for i, v in enumerate(indices)]
+        run_fortran_executable(
+            executable_path, 
+            (sza, vza, raa, aod, band), 
+            input_indices=[sza_index, vza_index] + list(indices), 
+            output_mask=lut_block, 
+            BLOCK=True,
+            LOG=LOG
+        )
+        
+    return lut_block, sza_index, vza_index
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Run Fortran executable with parameter combinations")
     parser.add_argument('-d', '--directory', dest='sixs_dir', type=str, default='./fortran', help='6S code directory. Defaults to ./fortran')
-    parser.add_argument("--make", action="store_true", default=False, help="Make the 6s executable from scratch.")
-    parser.add_argument('--no-save', action='store_true', dest='no_save', default=False, help='Don\'t save to lookup table.')
+    parser.add_argument('-r', '--recompile', action='store_true', dest='recompile', default=False, help='Recompile the 6s executable from scratch.')
+    parser.add_argument('-n', '--no-save', action='store_true', dest='no_save', default=False, help='Don\'t save to lookup table.')
+    parser.add_argument('-m', '--multiprocess', action='store_true', dest='multiprocess', default=False, help='Use multipleprocessing.')
     args = parser.parse_args()
     
     if not os.path.exists(args.sixs_dir) or not os.path.isdir(args.sixs_dir):
         parser.error(f'{args.sixs_dir} is not a directory or does not exist.')
         
-    if args.make:
+    if args.recompile:
         subprocess.run(f'cd {args.sixs_dir} && make && make clean && cd ..', shell=True)
         
     # Define paths and list of input files
@@ -152,9 +167,8 @@ if __name__ == '__main__':
     if executable_path is None:
         print('Executable for 6S not found. Consider running with --make')
         quit()
-    
-    # subprocess.run('ls')
-    # subprocess.run(f'cd fortran && chmod +x "{executable_path.name}" && cd ..')
+
+    all_sims_start_time = time.time()
         
     with open('./new_srfs.json', 'r') as json_f:
         data = json.load(json_f)
@@ -210,53 +224,100 @@ if __name__ == '__main__':
             band_var[:] = np.array(input_params[4])
             table_var[:] = np.zeros(shape=(7, *(len(param) for param in input_params)))
     
-    lut_block = np.zeros(shape=(7, *(shape[-3:])))
     RESUME_BLOCK = (0, 0)
     last_save_lut_ind = RESUME_BLOCK[1]
-    for indices in product(*input_indices):    
-        if count % 100 == 0:
-            print('Processing', count, '/', size)    
-        count += 1
+    
+    if args.multiprocess:
+        futures = []
+        
+    BLOCK_COUNT = len(input_params[0]) * len(input_params[1])
+        
+    # for sza_i, vza_i in zip(input_indices[0], input_indices[1]):
+    
+    curr_executor = None
+     
+    def process_blocks_iter():
+        block_inds = list(product(input_indices[0], input_indices[1]))
+        index = 0
+        count = 0
 
-    # for sza, vza, raa, aod, band in product(*input_params):
-    # for i in range(5):
-        # sza, vza, raa, aod, band = random_product(*input_params)
-        # sza, vza, raa, aod, band = 0.10, 0.20, 30, 0.1, 200+i
-        sza, vza, raa, aod, band = [input_params[i][v] for i, v in enumerate(indices)]
-        if indices[0] < RESUME_BLOCK[0] or (indices[0] == RESUME_BLOCK[0] and indices[1] < RESUME_BLOCK[1]):
-            continue
-                
-        if indices[1] != last_save_lut_ind:
-            last_save_lut_ind = indices[1]
-            target_sza_ind = indices[0]
-            if last_save_lut_ind == 0:
-                target_sza_ind -= 1
-                target_vza_ind = 15
-            else: 
-                target_vza_ind = last_save_lut_ind - 1
+        while index < BLOCK_COUNT:
+            sza_i, vza_i = block_inds[index]
+            sza, vza = input_params[0][sza_i], input_params[1][vza_i]
+            if sza_i < RESUME_BLOCK[0] or (sza_i == RESUME_BLOCK[0] and vza_i < RESUME_BLOCK[1]):
+                index += 1
+                count += 1
+                continue
             
-            if not args.no_save:    
-                print('Saving block...', target_sza_ind, target_vza_ind)
-                print(' ', np.count_nonzero(lut_block))
-                with Dataset(nc_filepath, 'a') as nc:
-                    lut = nc.variables['Lutvars']
-                    lut[:, target_sza_ind, target_vza_ind, :, :, :] = lut_block
+            if not args.multiprocess:
+                count += 1
+                print(f'Processing block {count} / {BLOCK_COUNT}')
+                start_time = time.time()
+                lut_block, sza_i, vza_i = process_block(
+                    sza, vza, sza_i, vza_i,
+                    input_params[-3:],
+                    input_indices[-3:],
+                    LOG=args.no_save
+                )
+                
+                yield lut_block, sza_i, vza_i, start_time
+                index += 1
+                
+            else:
+                futures = []
+                for _ in range(curr_executor._max_workers):
+                    print(f'Processing block {count} / {BLOCK_COUNT}')
+                    if index >= len(block_inds):
+                        break
                     
-                lut_block[:] = 0
-                print('Saved')
-        
-        # output_path = output_dir / f"{count}_output_test.txt"
-        # print(input_text)
-        # thread = threading.Thread(target=run_fortran_executable, args=(executable_path, (sza, vza, raa, aod, band), output_path))
-        
-        # thread.start()
-        run_fortran_executable(
-            executable_path, 
-            (sza, vza, raa, aod, band), 
-            input_indices=indices, 
-            output_mask=lut_block, 
-            BLOCK=True,
-            LOG=args.no_save
-        )
+                    sza_i, vza_i = block_inds[index]
+                    sza, vza = input_params[0][sza_i], input_params[1][vza_i]
+                    count += 1
+                    
+                    futures.append(
+                        curr_executor.submit(
+                            process_block,
+                            sza, vza, sza_i, vza_i,
+                            input_params[-3:],
+                            input_indices[-3:],
+                            LOG=args.no_save
+                        )
+                    )
+                    
+                    index += 1
 
-    print('Done')
+                yield futures, time.time()
+                
+    if args.multiprocess:
+        to_process = process_blocks_iter()
+        try:
+            while True:
+                with ProcessPoolExecutor() as executor:
+                    curr_executor = executor
+                    futures, start_time = next(to_process)
+                    
+                    for future in as_completed(futures):
+                        lut_block, sza_i, vza_i = future.result()
+                        with Dataset(nc_filepath, 'a') as nc:
+                            lut = nc.variables['Lutvars']
+                            lut[:, sza_i, vza_i, :, :, :] = lut_block
+                            print(f' Saved: ({sza_i}, {vza_i})')
+                
+                end_time = time.time()
+                print(f' {executor._max_workers} blocks took {(end_time - start_time):2f} seconds')
+        except StopIteration:
+            pass
+        
+    else:
+        to_process = process_blocks_iter()
+        for lut_block, sza_i, vza_i, start_time in to_process:
+            with Dataset(nc_filepath, 'a') as nc:
+                lut = nc.variables['Lutvars']
+                lut[:, sza_i, vza_i, :, :, :] = lut_block
+                print(f' Saved: ({sza_i}, {vza_i})')  
+                
+            end_time = time.time()
+            print(f' Block took {(end_time - start_time):2f} seconds') 
+
+    total_elapsed_time = time.time() - all_sims_start_time
+    print(f'Done. Total time: {total_elapsed_time:2f} seconds')

@@ -46,9 +46,11 @@ Creates the modified 6S code. By default, outputs to `fortran` directory.
 Run `python edit_6s_code.py -h` to see more options.
 
 ## Creating the Lookup Table
-`python run.py --make`
+`python run.py -r [--multiprocess]`
 
 This will compile the 6S code and create the lookup table in blocks.
 Run without the `--make` option if you have already compiled the 6S executable. 
+
+Set `--multiprocess` to use multiple cores. Highly recommended to speed up processing if you have multiple cores available.  
 
 Run `python run.py -h` to see more options.
