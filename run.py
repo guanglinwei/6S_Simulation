@@ -20,11 +20,7 @@ def run_fortran_executable(executable_path, input_params: tuple, input_indices: 
     - input_file (str or Path): Path to the input file to provide via stdin.
     - output_file (str or Path): Path where stdout will be written.
     """
-    # ASDF = False
-    # if random.random() < 0.01:
-    #     ASDF = True
-    # if ASDF:
-    #     print(input_params, input_indices)
+    
     sza, vza, raa, aod, band = input_params
     input_text = create_input_text(sza, vza, raa, aod, band)
     # Run the Fortran executable with input redirected from input_text and output to outfile
@@ -106,12 +102,18 @@ def rangef_inc(min, max, step):
     epsilon = step / 100
     return np.linspace(min, max, int((max - min + epsilon) / step) + 1).tolist()
 
+# https://salsa.umd.edu/files/6S/6S_Manual_Part_1.pdf
+# Look in the 6S manual for descriptions of the simulation parameters
+# For example gas absorption is on page 35, aerosol model on page 36
 def create_input_text(sza, vza, raa, aod, band):
-    _MONTH, _DAY = 4, 28
+    _MONTH, _DAY = 4, 5 # 28
+    GAS_ABSORPTION = 0
+    AEROSOL_MODEL = 1
+    
     text = f'''0 (User defined)
 {sza:.2f} 0.0 {vza:.2f} {raa:.2f} {_MONTH} {_DAY} (geometrical conditions)
-0  (No Gaseous Absorptio)
-1 Continental Model
+{GAS_ABSORPTION}  (No Gaseous Absorptio)
+{AEROSOL_MODEL} Continental Model
 0
 {aod:.2f} value
 0 (target level)
@@ -125,7 +127,7 @@ def create_input_text(sza, vza, raa, aod, band):
 '''
     return text
 
-def process_block(sza, vza, sza_index, vza_index, block_param_values, block_param_indices, LOG):
+def process_block(sza, vza, sza_index, vza_index, block_param_values, block_param_indices, shape, executable_path, LOG):
     lut_block = np.zeros(shape=(7, *(shape[-(len(block_param_indices)):])))
     for indices in product(*block_param_indices):
         raa, aod, band = [block_param_values[i][v] for i, v in enumerate(indices)]
@@ -146,6 +148,7 @@ if __name__ == '__main__':
     parser.add_argument('-r', '--recompile', action='store_true', dest='recompile', default=False, help='Recompile the 6s executable from scratch.')
     parser.add_argument('-n', '--no-save', action='store_true', dest='no_save', default=False, help='Don\'t save to lookup table.')
     parser.add_argument('-m', '--multiprocess', action='store_true', dest='multiprocess', default=False, help='Use multipleprocessing.')
+    parser.add_argument('-o', '--output', dest='output', type=str, default='lutabi.nc', help='Output NC filename.')
     args = parser.parse_args()
     
     if not os.path.exists(args.sixs_dir) or not os.path.isdir(args.sixs_dir):
@@ -165,7 +168,7 @@ if __name__ == '__main__':
             break
         
     if executable_path is None:
-        print('Executable for 6S not found. Consider running with --make')
+        print('Executable for 6S not found. Consider running with --recompile')
         quit()
 
     all_sims_start_time = time.time()
@@ -175,6 +178,7 @@ if __name__ == '__main__':
         band_range = range(data['start_band_index'], data['start_band_index'] + len(data['new_srfs']))
         band_names = data['new_srfs']
     
+    # Ranges for parameters
     input_params = [
         rangef_inc(0, 0.75, 0.05), # SZA
         rangef_inc(0, 0.75, 0.05), # VZA
@@ -194,10 +198,13 @@ if __name__ == '__main__':
     # Run the executable on each input file
     count = 0
     
-    nc_filepath = os.path.join(output_dir, 'lutabi.nc')
+    output_filename = args.output
+    
+    # Init the NC file
+    nc_filepath = os.path.join(output_dir, output_filename)
     if not args.no_save and not os.path.exists(nc_filepath):
         print('Creating NC file')
-        with Dataset(os.path.join(output_dir, 'lutabi.nc'), 'w', format='NETCDF4') as nc:
+        with Dataset(os.path.join(output_dir, output_filename), 'w', format='NETCDF4') as nc:
             nc.createDimension('NumVars', 7)
             nc.createDimension('SolarZenithInterval', 16)
             nc.createDimension('ViewZenithInterval', 16)
@@ -257,6 +264,8 @@ if __name__ == '__main__':
                     sza, vza, sza_i, vza_i,
                     input_params[-3:],
                     input_indices[-3:],
+                    shape,
+                    executable_path,
                     LOG=args.no_save
                 )
                 
@@ -280,6 +289,8 @@ if __name__ == '__main__':
                             sza, vza, sza_i, vza_i,
                             input_params[-3:],
                             input_indices[-3:],
+                            shape,
+                            executable_path,
                             LOG=args.no_save
                         )
                     )
@@ -296,10 +307,10 @@ if __name__ == '__main__':
                     curr_executor = executor
                     futures, start_time = next(to_process)
                     
-                    for future in as_completed(futures):
-                        lut_block, sza_i, vza_i = future.result()
-                        with Dataset(nc_filepath, 'a') as nc:
-                            lut = nc.variables['Lutvars']
+                    with Dataset(nc_filepath, 'a') as nc:
+                        lut = nc.variables['Lutvars']
+                        for future in as_completed(futures):
+                            lut_block, sza_i, vza_i = future.result()
                             lut[:, sza_i, vza_i, :, :, :] = lut_block
                             print(f' Saved: ({sza_i}, {vza_i})')
                 

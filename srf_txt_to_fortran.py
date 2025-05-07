@@ -1,3 +1,5 @@
+# Converts SRF text files into .f code
+
 import argparse
 import os
 import numpy as np
